@@ -1,18 +1,13 @@
 <script setup>
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
-import { useAccountStore } from "@/stores/account";
-import { watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { check } from "./services/accountService";
-
-const route = useRoute();
-const account = useAccountStore();
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
+import GlobalModal from "./components/GlobalModal.vue";
 </script>
 
 <template>
   <Header />
-  <router-view></router-view>
+  <router-view />
+  <GlobalModal />
   <Footer />
 </template>
 

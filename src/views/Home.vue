@@ -30,9 +30,9 @@ onMounted(async () => {
 
 <template>
   <div class="home">
-    <b-modal v-model="globalErrorStore.state.isShow" ok-only>{{
-      useGlobalErrorStore.state.errorMessage
-    }}</b-modal>
+    <b-modal v-model="globalErrorStore.state.isShow" ok-only>
+      {{ globalErrorStore.state.errorMessage }}
+    </b-modal>
     <div class="container">
       <h1 class="custom-title">
         ┃ scent the dream<span class="clover"></span>

@@ -1,56 +1,55 @@
 <script setup>
-import { computed } from "vue";
-import { onMounted, reactive } from "vue";
 import { getItems, removeItem, removeAll } from "@/services/cartService";
+import { reactive, onMounted } from "vue";
+import { computed } from "vue";
 
-//반응형 상태
-const state = reactive({
-  items: [],
-});
+const state = reactive({ items: [] });
+const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
 
-//장바구니 이동
 const load = async () => {
   const res = await getItems();
-  if (res.status === 200) {
-    state.items = res.data;
-  }
-};
-
-//장바구니 상품 삭제
-const remove = async (cartId) => {
-  const res = await removeItem(cartId);
-
   if (res === undefined || res.status !== 200) {
     return;
   }
-  window.alert("선택하신 장바구니의 상품을 삭제했습니다.");
+  state.items = res.data;
+};
+const remove = async (cartId) => {
+  const res = await removeItem(cartId);
+  if (res === undefined || res.status !== 200) {
+    return;
+  }
   load();
+  //다시 리로딩
+  //or
+  //방금 삭제한 객체만 state.items에서 삭제한다.
 };
 
 const clear = async () => {
   const res = await removeAll();
   if (res === undefined || res.status !== 200) {
-    alert("오류발생");
     return;
   }
   state.items = [];
 };
 
-onMounted(async () => {
+onMounted(() => {
   load();
 });
 
-//합계
-const totalPrice = computed(() => {
-  return state.items.reduce((sum, item) => {
-    const discounted = item.price - (item.price * item.discountPer) / 100;
-    return sum + discounted;
-  }, 0);
-});
+// 총 합계 계산
+const totalPrice = computed(() =>
+  state.items.reduce((sum, i) => {
+    if (i.price !== undefined && i.discountPer !== undefined) {
+      return sum + (i.price - (i.price * i.discountPer) / 100);
+    }
+    return sum;
+  }, 0)
+);
 </script>
 
 <template>
   <h1 class="cart-title">Shopping Cart</h1>
+
   <div class="cart">
     <div class="container">
       <template v-if="state.items.length">
@@ -58,8 +57,9 @@ const totalPrice = computed(() => {
           <li v-for="i in state.items" :key="i.id">
             <img
               :alt="`상품 사진(${i.name})`"
-              :src="`http://localhost:8080/pic/item/${i.imgPath}`"
+              :src="`${baseUrl}/pic/item/${i.imgPath}`"
             />
+
             <b class="name">{{ i.name }}</b>
             <span class="price">
               {{

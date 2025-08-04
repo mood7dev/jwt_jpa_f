@@ -9,7 +9,7 @@ export const useAccountStore = defineStore(
       isSigned: false,
     });
 
-    const setSignedUser = (val) => {
+    const setSigendUser = (val) => {
       state.signedUser = val;
       state.isSigned = true;
     };
@@ -19,9 +19,7 @@ export const useAccountStore = defineStore(
       state.isSigned = false;
     };
 
-    return { state, setSignedUser, logout };
+    return { state, setSigendUser, logout };
   },
-  {
-    persist: true,
-  }
+  { persist: true }
 );

@@ -12,12 +12,11 @@ const state = reactive({
     loginPw: "",
   },
 });
-
 const submit = async () => {
   const res = await join(state.form);
-  console.log("res: ", res);
+  console.log("res:", res);
   if (res.status === 200) {
-    alert("회원가입을 축하합니다");
+    alert("회원가입을 축하합니다.");
     await router.push("/");
   }
 };
@@ -26,10 +25,9 @@ const submit = async () => {
 <template>
   <div class="join">
     <div class="container">
-      <form class="py-5" @submit.prevent="submit">
+      <form class="py-5 d-flex flex-column gap-3" @submit.prevent="submit">
         <h1 class="h5 mb-3">회원가입</h1>
-
-        <div class="form-floating mb-3">
+        <div class="form-floating">
           <input
             type="text"
             class="form-control"
@@ -39,10 +37,9 @@ const submit = async () => {
           />
           <label for="name">이름</label>
         </div>
-
-        <div class="form-floating mb-3">
+        <div class="form-floating">
           <input
-            type="email"
+            type="text"
             class="form-control"
             id="loginId"
             placeholder="이메일"
@@ -50,27 +47,25 @@ const submit = async () => {
           />
           <label for="loginId">이메일</label>
         </div>
-
-        <div class="form-floating mb-3">
+        <div class="form-floating">
           <input
             type="password"
             class="form-control"
-            id="password"
+            id="loginPw"
             placeholder="패스워드"
             v-model="state.form.loginPw"
             autocomplete="off"
           />
           <label for="loginPw">패스워드</label>
         </div>
-
-        <button type="submit" class="w-100 btn btn-primary">회원가입</button>
+        <button class="w-100 h6 btn py-3 btn-primary">회원가입</button>
       </form>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.join > .container {
+.container {
   max-width: 576px;
 }
 </style>

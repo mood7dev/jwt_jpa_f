@@ -1,7 +1,9 @@
 <script setup>
-import { reactive, onMounted } from "vue";
-import axios from "axios";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { getOrder } from "@/services/OrderService";
+
+const baseUrl = ref(import.meta.env.VITE_BASE_URL);
 
 const route = useRoute();
 
@@ -17,40 +19,14 @@ const state = reactive({
   },
 });
 
-const getOrder = async (id) => {
-  return axios.get(`/order/${id}`);
-};
-
 onMounted(async () => {
   const orderId = route.params.id;
-
-  if (orderId) {
-    // 기존처럼 API 호출
-    const res = await getOrder(orderId);
-    if (res === undefined || res.status !== 200) {
-      alert("오류 발생");
-      return;
-    }
-    state.order = res.data;
-  } else {
-    // route.params.id 없으면 바로구매로 왔다는 뜻
-    const orderItemStr = localStorage.getItem("orderItem");
-    if (!orderItemStr) {
-      alert("주문할 상품 정보가 없습니다.");
-      return;
-    }
-    const orderItem = JSON.parse(orderItemStr);
-    // localStorage에서 바로구매 상품 정보를 이용해서 order 객체 직접 세팅
-    state.order = {
-      id: 0,
-      name: "", // 필요하면 로그인 사용자 이름 등으로 채우기
-      address: "",
-      payment: "",
-      amount: orderItem.price,
-      created: new Date().toISOString(),
-      items: [orderItem],
-    };
+  const res = await getOrder(orderId);
+  if (res === undefined || res.status !== 200) {
+    alert("오류 발생");
+    return;
   }
+  state.order = res.data;
 });
 </script>
 
@@ -109,7 +85,12 @@ onMounted(async () => {
             <tbody>
               <tr v-for="(item, idx) in state.order.items" :key="item.id">
                 <td>{{ idx + 1 }}</td>
-                <td><img :src="`/pic/item/${item.imgPath}`" alt="테스트" /></td>
+                <td>
+                  <img
+                    :src="`${baseUrl}/pic/item/${item.id}/${item.imgPath}`"
+                    alt="테스트"
+                  />
+                </td>
                 <td>{{ item.name }}</td>
               </tr>
             </tbody>
@@ -132,7 +113,7 @@ table img {
         padding: 15px 25px;
       }
       th {
-        background: #f7f7f7;
+        background-color: #f7f7f7;
       }
     }
   }

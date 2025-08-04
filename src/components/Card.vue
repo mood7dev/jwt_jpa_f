@@ -2,8 +2,13 @@
 import { computed } from "vue";
 import { addItem } from "@/services/cartService";
 import { ref, onMounted } from "vue";
+import { useGlobalModalStore } from "@/stores/global-modal";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
+const modalStore = useGlobalModalStore();
 const orderItem = ref(null);
+const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
 
 onMounted(() => {
   const item = localStorage.getItem("orderItem");
@@ -35,40 +40,16 @@ const computedItemDiscountPrice = computed(() => {
 
 // 장바구니에 상품 담기
 const put = async () => {
-  const res = await addItem(props.item.id).catch((e) => e.response);
-  if (!res) {
-    alert("장바구니 요청 실패");
-    return;
-  }
-
-  if (res.status === 409) {
-    console.log("res.status:", res.status);
-    alert("이미 장바구니에 있는 상품입니다.");
-    return;
-  }
-  // 로그인 된 상태라면 장바구니 담기 API 호출
-  if (res.status === 401 || res.status === 403) {
-    const goLogin = confirm(
-      "로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?"
+  const res = await addItem(props.item.id);
+  if (res.status === 200) {
+    modalStore.setMessage(
+      "장바구니에 상품을 담았습니다. 장바구니로 이동하시겠습니까?"
     );
-    if (goLogin) {
-      window.location.href = "/login";
-    }
-    return;
-  }
-
-  if (res.status !== 200) {
-    console.log("res.status: ", res.status);
-    alert("장바구니 요청 실패");
-    return;
-  }
-
-  //장바구니로 가기
-  const goCart = confirm(
-    "상품을 장바구니에 담았습니다. 장바구니로 이동하시겠습니까?"
-  );
-  if (goCart) {
-    window.location.href = "/cart";
+    modalStore.setConfirm(true, () => {
+      router.push("/cart");
+      modalStore.closeModal();
+    });
+    modalStore.open();
   }
 };
 
@@ -87,7 +68,7 @@ const computedDiscountRate = computed(() => {
     <span
       class="img"
       :style="{
-        backgroundImage: `url(http://localhost:8080/pic/item/${props.item.imgPath})`,
+        backgroundImage: `url(${baseUrl}/pic/item/${props.item.imgPath})`,
       }"
       :aria-label="`상품사진(${props.item.name})`"
     ></span>
