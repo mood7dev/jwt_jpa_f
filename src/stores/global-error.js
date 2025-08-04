@@ -6,8 +6,8 @@ export const useGlobalErrorStore = defineStore("global-error", () => {
     errorMessage: null,
     isShow: false,
   });
-  const setErrorMessage = (bal) => {
-    state.errorMessage = Val;
+  const setErrorMessage = (val) => {
+    state.errorMessage = val;
     state.isShow = true;
   };
   return { state, setErrorMessage };
